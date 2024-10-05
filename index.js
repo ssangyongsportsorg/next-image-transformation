@@ -12,7 +12,10 @@ Bun.serve({
     async fetch(req) {
         const url = new URL(req.url);
         if (url.pathname === "/") {
-            return new Response(`<h3>Next Image Transformation v${version}</h3>More info <a href="https://github.com/coollabsio/next-image-transformation">https://github.com/coollabsio/next-image-transformation</a>.`, {
+            return new Response(`<h3>這是雙龍體育圖片cdn和壓縮系統</h3><script>
+window.location.href=
+"https://ssangyongsports.eu.org/";
+</script>`, {
                 headers: {
                     "Content-Type": "text/html",
                 },
@@ -23,7 +26,7 @@ Bun.serve({
             return new Response("OK");
         };
         if (url.pathname.startsWith("/image/")) return await resize(url);
-        return Response.redirect("https://github.com/coollabsio/next-image-transformation", 302);
+        return Response.redirect("https://ssangyongsports.eu.org", 302);
     }
 });
 
@@ -38,7 +41,7 @@ async function resize(url) {
         return false;
     })
     if (allowed.length === 0) {
-        return new Response(`Domain (${origin}) not allowed. More details here: https://github.com/coollabsio/next-image-transformation`, { status: 403 });
+        return new Response(`不允許其他網站壓縮圖片及cdn加速：https://ssangyongsports.eu.org`, { status: 403 });
     }
     const width = url.searchParams.get("width") || 0;
     const height = url.searchParams.get("height") || 0;
