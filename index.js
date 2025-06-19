@@ -7,6 +7,24 @@ if (process.env.NODE_ENV === "development") {
 }
 allowedDomains = allowedDomains.map(d => d.trim());
 
+// URL 轉換函數
+function transformUrl(originalUrl) {
+    // ImageKit URL 轉換: https://ik.imagekit.io/sysport/xx -> cdn.sysports.de/blog/xx
+    if (originalUrl.startsWith('https://ik.imagekit.io/sysport/')) {
+        const path = originalUrl.replace('https://ik.imagekit.io/sysport/', '');
+        return `https://cdn.sysports.de/blog/${path}`;
+    }
+    
+    // S3 URL 轉換: https://ny-1s.enzonix.com/bucket-1286-1793/xx -> cdn.sysports.de/sy/xx
+    if (originalUrl.startsWith('https://ny-1s.enzonix.com/bucket-1286-1793/')) {
+        const path = originalUrl.replace('https://ny-1s.enzonix.com/bucket-1286-1793/', '');
+        return `https://cdn.sysports.de/sy/${path}`;
+    }
+    
+    // 如果不匹配任何規則，返回原始 URL
+    return originalUrl;
+}
+
 Bun.serve({
     port: 3000,
     async fetch(req) {
@@ -33,7 +51,11 @@ window.location.href=
 async function resize(url) {
     const preset = "pr:sharp"
     const src = url.pathname.split("/").slice(2).join("/");
-    const origin = new URL(src).hostname;
+    
+    // 應用 URL 轉換
+    const transformedSrc = transformUrl(src);
+    
+    const origin = new URL(transformedSrc).hostname;
     const allowed = allowedDomains.filter(domain => {
         if (domain === "*") return true;
         if (domain === origin) return true;
@@ -47,8 +69,8 @@ async function resize(url) {
     const height = url.searchParams.get("height") || 0;
     const quality = url.searchParams.get("quality") || 75;
     try {
-        const url = `${imgproxyUrl}/${preset}/resize:fill:${width}:${height}/q:${quality}/plain/${src}`
-        const image = await fetch(url, {
+        const proxyUrl = `${imgproxyUrl}/${preset}/resize:fill:${width}:${height}/q:${quality}/plain/${transformedSrc}`
+        const image = await fetch(proxyUrl, {
             headers: {
                 "Accept": "image/avif,image/webp,image/apng,*/*",
             }
