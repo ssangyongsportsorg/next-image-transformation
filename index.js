@@ -21,6 +21,11 @@ function transformUrl(originalUrl) {
         return `https://cdn.sysports.de/sy/${path}`;
     }
     
+    // 處理已經是 cdn.sysports.de 的 URL，直接返回原始 URL
+    if (originalUrl.startsWith('https://cdn.sysports.de/')) {
+        return originalUrl;
+    }
+    
     // 如果不匹配任何規則，返回原始 URL
     return originalUrl;
 }
