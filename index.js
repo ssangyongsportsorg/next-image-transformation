@@ -21,11 +21,6 @@ function transformUrl(originalUrl) {
         return `https://cdn.sysports.de/sy/${path}`;
     }
     
-    // 處理已經是 cdn.sysports.de 的 URL，直接返回原始 URL
-    if (originalUrl.startsWith('https://cdn.sysports.de/')) {
-        return originalUrl;
-    }
-    
     // 如果不匹配任何規則，返回原始 URL
     return originalUrl;
 }
@@ -48,7 +43,15 @@ window.location.href=
         if (url.pathname === "/health") {
             return new Response("OK");
         };
+        
+        // 處理 /image/ 路徑（舊的API格式）
         if (url.pathname.startsWith("/image/")) return await resize(url);
+        
+        // 處理 CDN 路徑
+        if (url.pathname.startsWith("/blog/") || url.pathname.startsWith("/sy/")) {
+            return await serveCdnImage(url);
+        }
+        
         return Response.redirect("https://ssangyongsports.eu.org", 302);
     }
 });
